@@ -1,0 +1,19 @@
+title: Mein Home Assistant Dashboard
+views:
+  - title: Startseite
+    path: home
+    icon: mdi:home
+    cards:
+      - type: entities
+        title: Übersicht
+        entities:
+          - sensor.temperatur
+          - light.wohnzimmer
+
+  - title: Energie
+    path: energie
+    icon: mdi:lightning-bolt
+    cards:
+      - type: gauge
+        entity: sensor.hausleistung
+        name: Hausleistung

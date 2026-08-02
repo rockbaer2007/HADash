@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "key": "lovelace",
+  "data": {
+    "config": {
+      "title": "Beispiel aus Backup",
+      "views": [
+        {
+          "title": "Start",
+          "path": "start",
+          "cards": [
+            {
+              "type": "markdown",
+              "content": "Dashboard aus einer JSON-Backupdatei"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

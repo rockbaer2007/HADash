@@ -1,0 +1,9 @@
+data:
+  config:
+    title: Beispiel aus YAML-Backup
+    views:
+      - title: Übersicht
+        path: uebersicht
+        cards:
+          - type: markdown
+            content: Dashboard aus einer YAML-Backupdatei

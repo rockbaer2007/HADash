@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>HADashboardBackupExporteurUGSo</RootNamespace>
+    <AssemblyName>HADash.App</AssemblyName>
+    <Product>HADash – Home Assistant Dashboard Toolkit</Product>
+    <Company>UGSo</Company>
+    <Authors>UGSo</Authors>
+    <Copyright>© 2026 UGSo</Copyright>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Refresh_icon.png"
+                      LogicalName="HADashboardBackupExporteurUGSo.Resources.Refresh_icon.png" />
+    <EmbeddedResource Include="Resources\document-file.png"
+                      LogicalName="HADashboardBackupExporteurUGSo.Resources.document-file.png" />
+    <EmbeddedResource Include="Resources\kopieren.png"
+                      LogicalName="HADashboardBackupExporteurUGSo.Resources.kopieren.png" />
+    <EmbeddedResource Include="Resources\export.png"
+                      LogicalName="HADashboardBackupExporteurUGSo.Resources.export.png" />
+    <EmbeddedResource Include="Resources\dashboards.png"
+                      LogicalName="HADashboardBackupExporteurUGSo.Resources.dashboards.png" />
+    <EmbeddedResource Include="Resources\visualisierung.png"
+                      LogicalName="HADashboardBackupExporteurUGSo.Resources.visualisierung.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="config\user.config" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

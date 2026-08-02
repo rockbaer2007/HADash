@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>HADash</AssemblyName>
+    <RootNamespace>HADashLauncher</RootNamespace>
+    <Product>HADash by UGSo</Product>
+    <Company>UGSo</Company>
+    <Authors>UGSo</Authors>
+    <Copyright>© 2026 UGSo</Copyright>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+
+  <!--
+    Absichtlich KEIN ProjectReference auf die .NET-8-WinForms-Anwendung.
+    Der Launcher läuft auf .NET Framework 4.8 und kann deshalb auch dann
+    den Installationshinweis anzeigen, wenn die .NET-8-Desktop-Runtime fehlt.
+  -->
+  <Target Name="BuildMainApplication" BeforeTargets="Build">
+    <MSBuild Projects="..\HADash.App\HADash.App.csproj"
+             Targets="Restore;Build"
+             Properties="Configuration=$(Configuration)" />
+  </Target>
+
+  <Target Name="CopyMainApplication" AfterTargets="Build">
+    <ItemGroup>
+      <MainApplicationFiles Include="..\HADash.App\bin\$(Configuration)\net8.0-windows\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(MainApplicationFiles)"
+          DestinationFiles="@(MainApplicationFiles->'$(OutDir)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true"
+          Condition="'@(MainApplicationFiles)' != ''" />
+  </Target>
+</Project>

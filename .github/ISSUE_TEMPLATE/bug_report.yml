@@ -1,0 +1,45 @@
+name: Fehler melden
+description: Einen reproduzierbaren Fehler in HADash melden
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: HADash-Version
+      placeholder: 2.5.3
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows-Version
+      placeholder: Windows 11 24H2
+    validations:
+      required: true
+  - type: dropdown
+    id: format
+    attributes:
+      label: Dateiformat
+      options:
+        - .dash
+        - .yaml / .yml
+        - .json
+        - .txt / andere
+  - type: textarea
+    id: description
+    attributes:
+      label: Fehlerbeschreibung
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zur Reproduktion
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Fehlermeldung oder Logauszug
+      render: text
