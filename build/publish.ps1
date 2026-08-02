@@ -156,13 +156,18 @@ function Test-GitTagExistsRemotely {
         [string]$Tag
     )
 
-    $result = & git ls-remote --tags $Remote "refs/tags/$Tag" 2>$null
+    $tagReference = "refs/tags/$Tag"
+
+    $result = @(
+        & git ls-remote --tags --refs $Remote $tagReference 2>$null |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+    )
 
     if ($LASTEXITCODE -ne 0) {
         throw "Remote-Tags konnten nicht von '$Remote' gelesen werden."
     }
 
-    return -not [string]::IsNullOrWhiteSpace(($result | Out-String))
+    return $result.Count -gt 0
 }
 
 function Get-CurrentCommit {
@@ -309,7 +314,7 @@ oder committe die Aenderungen vorher manuell.
 
     Write-Step "Remote-Stand abrufen"
 
-    Invoke-NativeCommand -FilePath "git" -Arguments @("fetch", "origin", "--tags", "--prune")
+    Invoke-NativeCommand -FilePath "git" -Arguments @("fetch", "origin", "--prune")
 
     $remoteTagExists = Test-GitTagExistsRemotely -Remote "origin" -Tag $tag
 

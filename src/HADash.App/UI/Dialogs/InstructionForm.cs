@@ -7,7 +7,7 @@ public sealed class InstructionForm : Form
     private const string HomeAssistantUrl = "https://www.home-assistant.io/";
     private const string NotepadPlusPlusUrl = "https://notepad-plus-plus.org/";
 
-    public InstructionForm(ThemePalette palette)
+    public InstructionForm()
     {
         Text = "Anleitung – HA Dashboard Backup & Ansichten Exporteur by UGSo";
         StartPosition = FormStartPosition.CenterParent;
@@ -105,14 +105,6 @@ public sealed class InstructionForm : Form
         AcceptButton = closeButton;
         CancelButton = closeButton;
 
-        ApplyTheme(palette, instructions, header, footer);
-    }
-
-    private void ApplyTheme(ThemePalette palette, RichTextBox textBox, params Control[] panels)
-    {
-        ThemeManager.ApplyControl(this, palette);
-        textBox.BackColor = palette.EditorBackground;
-        textBox.ForeColor = palette.EditorForeground;
     }
 
     private static void OpenUrl(string url)

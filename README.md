@@ -19,7 +19,7 @@ HADash entstand aus einem praktischen Bedarf: Einzelne Home-Assistant-Dashboard-
 - aus einer ausgewählten Ansicht ein vollständiges neues Dashboard erzeugen
 - komplette Dashboards als `.dash` oder `.yaml` speichern
 - portable Einstellungen unter `config/user.config`
-- Themes, zuletzt verwendete Dateien sowie Deutsch, Englisch und Französisch
+-  zuletzt verwendete Dateien sowie Deutsch, Englisch und Französisch
 - separater Launcher mit Prüfung der benötigten .NET-Desktop-Runtime
 
 ## Voraussetzungen für Entwickler

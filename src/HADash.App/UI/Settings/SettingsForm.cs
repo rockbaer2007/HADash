@@ -11,7 +11,7 @@ internal sealed class SettingsForm : Form
     private readonly List<(string Name, SettingsPage Page, bool Enabled)> _pages;
     public AppSettings ResultSettings => _working;
 
-    public SettingsForm(AppSettings current, ThemePalette palette)
+    public SettingsForm(AppSettings current)
     {
         _working = SettingsManager.CreateWorkingCopy(current);
         Text = "Einstellungen";
@@ -29,7 +29,7 @@ internal sealed class SettingsForm : Form
         _pages =
         [
             ("⚙  Allgemein", new GeneralPage(), true),
-            ("🎨  Darstellung", new ThemePage(), true),
+            ("🖥  Darstellung", new AppearancePage(), true),
             ("📂  Dateien", new FilePage(), true),
             ("📝  Protokoll", new LogPage(), true),
             ("🔄  Updates", new UpdatePage(), false),
@@ -84,8 +84,6 @@ internal sealed class SettingsForm : Form
 
         AcceptButton = ok;
         CancelButton = cancel;
-        ThemeManager.ApplyControl(this, palette);
-        _navigation.ApplyPalette(palette);
         _navigation.Select(0, raiseEvent: true);
     }
 
@@ -96,7 +94,6 @@ internal sealed class SettingsForm : Form
         _content.SuspendLayout();
         _content.Controls.Clear();
         _content.Controls.Add(page);
-        ThemeManager.ApplyControl(page, ThemeManager.CurrentPalette);
         _content.ResumeLayout();
     }
 }

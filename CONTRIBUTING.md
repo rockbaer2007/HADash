@@ -22,7 +22,6 @@ Danke für dein Interesse an HADash.
 
 - Benutzeroberfläche auf Deutsch, Englisch und Französisch berücksichtigen.
 - Portable Speicherung im Programmordner beibehalten.
-- Themewechsel darf keine Dashboarddatei erneut einlesen oder parsen.
 - Neue Einstellungsbereiche in die modulare Settings-Struktur einfügen.
 - Keine persönlichen Dashboarddaten oder Pfade committen.
 

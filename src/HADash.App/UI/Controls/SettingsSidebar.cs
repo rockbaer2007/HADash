@@ -52,23 +52,21 @@ internal sealed class SettingsSidebar : Panel
         if (raiseEvent) SelectedIndexChanged?.Invoke(index);
     }
 
-    public void ApplyPalette(ThemePalette palette)
+    private void RefreshSelection()
     {
-        BackColor = palette.PanelBackground;
-        _items.BackColor = palette.PanelBackground;
-        RefreshSelection(palette);
-    }
+        BackColor = SystemColors.Control;
+        _items.BackColor = SystemColors.Control;
 
-    private void RefreshSelection(ThemePalette? palette = null)
-    {
-        palette ??= ThemeManager.CurrentPalette;
         foreach (var button in _buttons)
         {
             var selected = ReferenceEquals(button, _selected);
-            button.BackColor = selected ? palette.Accent : palette.PanelBackground;
+            button.UseVisualStyleBackColor = true;
+            button.BackColor = selected ? SystemColors.Highlight : SystemColors.Control;
             button.ForeColor = button.Enabled
-                ? selected ? Color.White : palette.Foreground
+                ? selected ? SystemColors.HighlightText : SystemColors.ControlText
                 : SystemColors.GrayText;
+            button.FlatAppearance.BorderSize = selected ? 1 : 0;
+            button.FlatAppearance.BorderColor = selected ? SystemColors.Highlight : SystemColors.Control;
         }
     }
 }

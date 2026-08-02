@@ -6,7 +6,7 @@ public sealed class DashboardNameForm : Form
 
     public string DashboardName => _nameTextBox.Text;
 
-    public DashboardNameForm(string suggestedName, ThemePalette palette)
+    public DashboardNameForm(string suggestedName)
     {
         Text = "Neues Dashboard benennen";
         StartPosition = FormStartPosition.CenterParent;
@@ -65,6 +65,5 @@ public sealed class DashboardNameForm : Form
         AcceptButton = okButton;
         CancelButton = cancelButton;
 
-        ThemeManager.ApplyControl(this, palette);
     }
 }

@@ -45,7 +45,6 @@ public sealed class MainForm : Form
     private string? _currentDashboardYaml;
     private bool _currentSourceWasJson;
     private bool _isApplyingHighlighting;
-    private AppTheme _currentTheme = AppTheme.Light;
     private readonly List<YamlColorSpan> _yamlColorSpans = [];
 
     private enum YamlTokenKind
@@ -64,9 +63,7 @@ public sealed class MainForm : Form
         InitializeWindow();
         InitializeControls();
         WireEvents();
-        InitializeTheme();
         ApplyUiPreferences();
-        ApplyCurrentTheme(showStatusMessage: false);
         RefreshRecentFilesMenu();
 
         if (_settings.OpenLastFileOnStartup && !string.IsNullOrWhiteSpace(_settings.LastFilePath) && File.Exists(_settings.LastFilePath))
@@ -77,7 +74,7 @@ public sealed class MainForm : Form
 
     private void InitializeWindow()
     {
-        Text = "HADash by UGSo v2.5.3";
+        Text = "HADash by UGSo v0.9.4-preview";
         StartPosition = FormStartPosition.Manual;
         MinimumSize = new Size(980, 640);
         RestoreWindowSettings();
@@ -272,8 +269,8 @@ public sealed class MainForm : Form
         button.ImageAlign = ContentAlignment.MiddleCenter;
         button.Text = string.Empty;
         button.TextImageRelation = TextImageRelation.Overlay;
-        button.FlatStyle = FlatStyle.Flat;
-        button.FlatAppearance.BorderSize = 0;
+        button.FlatStyle = FlatStyle.Standard;
+        button.UseVisualStyleBackColor = true;
         button.Cursor = Cursors.Hand;
         button.AccessibleName = toolTipText;
         button.AccessibleDescription = toolTipText;
@@ -781,7 +778,7 @@ public sealed class MainForm : Form
         }
 
         var suggestedName = GetScalarValue(_dashboardRoot, "title") ?? selected.DisplayName;
-        using var nameDialog = new DashboardNameForm(suggestedName, ThemeManager.CurrentPalette);
+        using var nameDialog = new DashboardNameForm(suggestedName);
         if (nameDialog.ShowDialog(this) != DialogResult.OK)
             return;
 
@@ -898,8 +895,7 @@ public sealed class MainForm : Form
     {
         if (_isApplyingHighlighting) return;
 
-        // Nur bei einer echten Textänderung werden die Treffer neu ermittelt.
-        // Ein Theme-Wechsel verwendet anschließend ausschließlich diesen Cache.
+        // Die Treffer werden nur bei einer echten Textänderung neu ermittelt.
         _yamlColorSpans.Clear();
         if (_yamlTextBox.TextLength == 0) return;
 
@@ -926,11 +922,9 @@ public sealed class MainForm : Form
         {
             var selectionStart = _yamlTextBox.SelectionStart;
             var selectionLength = _yamlTextBox.SelectionLength;
-            var palette = ThemeManager.CurrentPalette;
-
             _yamlTextBox.SuspendLayout();
             _yamlTextBox.SelectAll();
-            _yamlTextBox.SelectionColor = palette.EditorForeground;
+            _yamlTextBox.SelectionColor = SystemColors.WindowText;
 
             foreach (var span in _yamlColorSpans)
             {
@@ -938,7 +932,7 @@ public sealed class MainForm : Form
                     continue;
 
                 _yamlTextBox.Select(span.Start, span.Length);
-                _yamlTextBox.SelectionColor = GetYamlTokenColor(span.Kind, palette);
+                _yamlTextBox.SelectionColor = GetYamlTokenColor(span.Kind);
             }
 
             var safeStart = Math.Min(selectionStart, _yamlTextBox.TextLength);
@@ -952,35 +946,25 @@ public sealed class MainForm : Form
         }
     }
 
-    private static Color GetYamlTokenColor(YamlTokenKind kind, ThemePalette palette) => kind switch
+    private static Color GetYamlTokenColor(YamlTokenKind kind) => kind switch
     {
-        YamlTokenKind.Key => palette.SyntaxKey,
-        YamlTokenKind.Comment => palette.SyntaxComment,
-        YamlTokenKind.Keyword => palette.SyntaxKeyword,
-        YamlTokenKind.Number => palette.SyntaxNumber,
-        _ => palette.EditorForeground
+        YamlTokenKind.Key => Color.DarkBlue,
+        YamlTokenKind.Comment => Color.ForestGreen,
+        YamlTokenKind.Keyword => Color.DarkMagenta,
+        YamlTokenKind.Number => Color.DarkCyan,
+        _ => SystemColors.WindowText
     };
-
-    private void InitializeTheme()
-    {
-        _currentTheme = Enum.TryParse<AppTheme>(_settings.ThemeName, true, out var parsed)
-            ? parsed
-            : (_settings.DarkMode ? AppTheme.Dark : AppTheme.Light);
-    }
 
     private void ShowSettings()
     {
-        using var dialog = new SettingsForm(_settings, ThemeManager.CurrentPalette);
+        using var dialog = new SettingsForm(_settings);
         if (dialog.ShowDialog(this) != DialogResult.OK)
             return;
 
-        var previousTheme = _currentTheme;
         _settings.CopyFrom(dialog.ResultSettings);
         _settings.Save();
-        _currentTheme = Enum.TryParse<AppTheme>(_settings.ThemeName, true, out var parsed) ? parsed : AppTheme.Light;
 
         ApplyUiPreferences();
-        ApplyCurrentTheme(showStatusMessage: previousTheme != _currentTheme);
         RefreshRecentFilesMenu();
         _statusLabel.Text = "Programmeinstellungen wurden übernommen.";
     }
@@ -1009,22 +993,10 @@ public sealed class MainForm : Form
         }
     }
 
-    private void ApplyCurrentTheme(bool showStatusMessage)
-    {
-        // Ausschließlich die vorhandenen Steuerelemente und bereits erkannten
-        // Syntaxbereiche werden neu eingefärbt. Die Datei wird weder gelesen
-        // noch als JSON/YAML geparst.
-        ThemeManager.ApplyTheme(this, _currentTheme);
-        ApplyCachedYamlColors();
-
-        if (showStatusMessage)
-            _statusLabel.Text = $"Design gewechselt: {ThemeManager.CurrentPalette.DisplayName} – Dashboard wurde nicht neu geladen.";
-    }
-
     private void ShowAbout()
     {
         MessageBox.Show(this,
-            "HADash\nVersion 2.5.1\n\nEntwickelt von UGSo\nMit Hilfe von ChatGPT\n\nÖffnet Home-Assistant-Dashboards und Backup-Dateien in JSON oder YAML, listet Ansichten auf und exportiert komplette Dashboards oder einzelne Ansichten.",
+            "HADash\nVersion 0.9.4-preview\n\nEntwickelt von UGSo\nMit Hilfe von ChatGPT\n\nÖffnet Home-Assistant-Dashboards und Backup-Dateien in JSON oder YAML, listet Ansichten auf und exportiert komplette Dashboards oder einzelne Ansichten.",
             "Über HA – Dashboard Backup & Ansichten Exporteur by UGSo",
             MessageBoxButtons.OK,
             MessageBoxIcon.Information);
@@ -1044,7 +1016,7 @@ public sealed class MainForm : Form
 
     private void ShowInstructions()
     {
-        using var dialog = new InstructionForm(ThemeManager.CurrentPalette);
+        using var dialog = new InstructionForm();
         dialog.ShowDialog(this);
     }
 

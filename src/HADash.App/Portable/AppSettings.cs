@@ -10,8 +10,6 @@ internal sealed class AppSettings
     public bool CheckForUpdates { get; set; } = false;
 
     public string? LastFilePath { get; set; }
-    public bool DarkMode { get; set; }
-    public string ThemeName { get; set; } = AppTheme.Light.ToString();
     public float FontSize { get; set; } = 10F;
     public int IconSize { get; set; } = 24;
 
@@ -56,8 +54,6 @@ internal sealed class AppSettings
                 OpenLastFileOnStartup = ReadBool(root, "OpenLastFileOnStartup", true),
                 CheckForUpdates = false,
                 LastFilePath = EmptyToNull((string?)root.Element("LastFilePath")),
-                ThemeName = EmptyToNull((string?)root.Element("ThemeName")) ?? AppTheme.Light.ToString(),
-                DarkMode = ReadBool(root, "DarkMode", false),
                 FontSize = Math.Clamp(ReadFloat(root, "FontSize", 10F), 8F, 16F),
                 IconSize = Math.Clamp(ReadInt(root, "IconSize", 24), 16, 32),
                 MaximumRecentFiles = Math.Clamp(ReadInt(root, "MaximumRecentFiles", 10), 1, 25),
@@ -95,8 +91,6 @@ internal sealed class AppSettings
                     new XElement("AutoDetectLanguage", AutoDetectLanguage),
                     new XElement("OpenLastFileOnStartup", OpenLastFileOnStartup),
                     new XElement("CheckForUpdates", false),
-                    new XElement("ThemeName", ThemeName),
-                    new XElement("DarkMode", DarkMode),
                     new XElement("FontSize", FontSize.ToString(System.Globalization.CultureInfo.InvariantCulture)),
                     new XElement("IconSize", IconSize),
                     new XElement("MaximumRecentFiles", MaximumRecentFiles),
@@ -127,8 +121,6 @@ internal sealed class AppSettings
         OpenLastFileOnStartup = OpenLastFileOnStartup,
         CheckForUpdates = false,
         LastFilePath = LastFilePath,
-        DarkMode = DarkMode,
-        ThemeName = ThemeName,
         FontSize = FontSize,
         IconSize = IconSize,
         RecentFiles = [.. RecentFiles],
@@ -147,7 +139,7 @@ internal sealed class AppSettings
     public void CopyFrom(AppSettings source)
     {
         Language = source.Language; AutoDetectLanguage = source.AutoDetectLanguage; OpenLastFileOnStartup = source.OpenLastFileOnStartup;
-        CheckForUpdates = false; ThemeName = source.ThemeName; DarkMode = source.DarkMode;
+        CheckForUpdates = false;
         FontSize = source.FontSize; IconSize = source.IconSize;
         MaximumRecentFiles = source.MaximumRecentFiles; CreateBackupCopies = source.CreateBackupCopies;
         DefaultDashboardFormat = source.DefaultDashboardFormat; LoggingEnabled = source.LoggingEnabled;
