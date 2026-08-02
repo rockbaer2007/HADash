@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.3-preview
+
+- Buttons in den Themes Hell, Blau und Home Assistant konsequent auf weiße Flächen gesetzt.
+- Automatische kontrastreiche Button-Textfarbe ergänzt.
+- Hover-, Pressed- und Rahmenfarben für helle Buttonflächen angepasst.
+- Dark Theme bleibt dunkel mit hellgrauem Rahmen.
+
 ## [0.9.2-preview] - 2026-08-02
 
 ### Geändert

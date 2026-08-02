@@ -52,7 +52,7 @@ public static class ThemeManager
         button.UseVisualStyleBackColor = false;
         button.FlatStyle = FlatStyle.Flat;
         button.BackColor = palette.ButtonBackground;
-        button.ForeColor = palette.Foreground;
+        button.ForeColor = GetContrastingButtonForeground(palette.ButtonBackground);
         button.FlatAppearance.BorderSize = 1;
         button.FlatAppearance.BorderColor = palette.ButtonBorder;
         button.FlatAppearance.MouseOverBackColor = palette.ButtonHoverBackground;
@@ -62,6 +62,14 @@ public static class ThemeManager
         // erkennbar bleiben. WinForms zeichnet den Text selbst abgeblendet.
         if (!button.Enabled)
             button.BackColor = ControlPaint.Dark(palette.ButtonBackground, 0.08f);
+    }
+
+    private static Color GetContrastingButtonForeground(Color background)
+    {
+        // Helle Buttonflächen benötigen dunklen Text. Das gilt insbesondere
+        // für Hell, Blau und Home Assistant, deren Buttons bewusst weiß sind.
+        var brightness = (background.R * 299 + background.G * 587 + background.B * 114) / 1000;
+        return brightness >= 160 ? Color.FromArgb(24, 24, 24) : Color.White;
     }
 
     private static Color GetBackground(Control control, ThemePalette palette) => control switch
