@@ -1,23 +1,61 @@
 # Release-Checkliste
 
-## Vor dem Tag
+HADash veröffentlicht Releases automatisch über einen Git-Tag.
 
-- [ ] `git status` ist sauber
-- [ ] `build\build.cmd` läuft fehlerfrei
-- [ ] `build\package.cmd` erzeugt das portable ZIP
-- [ ] Anwendung startet über `HADash.exe`
-- [ ] Runtime-Hinweis wurde auf einem System ohne .NET 8 geprüft
-- [ ] `.dash`, `.yaml` und `.json` wurden getestet
-- [ ] einzelne Ansicht wurde als TXT und YAML exportiert
-- [ ] ausgewählte Ansicht wurde als neues Dashboard erzeugt
-- [ ] komplettes Dashboard wurde gespeichert
-- [ ] portable `config\user.config` wird neben der EXE erzeugt
-- [ ] keine persönlichen Pfade befinden sich im Repository oder Paket
-- [ ] Versionsnummer und Changelog stimmen überein
+## Voraussetzungen
 
-## GitHub
+- Git für Windows
+- .NET 8 SDK
+- ein eingerichtetes Remote `origin`
+- GitHub Actions im Repository aktiviert
 
-- [ ] CI-Build ist grün
-- [ ] Release-Tag folgt dem Format `vX.Y.Z`
-- [ ] Portable ZIP ist als Release-Asset vorhanden
-- [ ] Release Notes enthalten Änderungen und bekannte Einschränkungen
+## Automatischer Ablauf
+
+Im Repository-Stamm ausführen:
+
+```cmd
+build\publish.cmd
+```
+
+Das Skript:
+
+1. liest die Version aus `Directory.Build.props`,
+2. prüft Git, .NET SDK, Branch und Remote,
+3. prüft auf ungespeicherte Git-Änderungen,
+4. erstellt lokal das Portable-Paket,
+5. prüft, ob der Release-Tag bereits auf GitHub existiert,
+6. erstellt den Tag `v<Version>`,
+7. pusht den aktuellen Branch,
+8. pusht den Tag,
+9. löst dadurch den GitHub-Actions-Workflow aus,
+10. GitHub erstellt den Release und hängt das Portable-ZIP an.
+
+## Änderungen automatisch committen
+
+```cmd
+build\publish.cmd -CommitMessage "Release v0.9.0-preview"
+```
+
+## Ohne Rückfrage veröffentlichen
+
+```cmd
+build\publish.cmd -Yes
+```
+
+## Nur Tag und GitHub-Automatik, ohne lokales Paket
+
+```cmd
+build\publish.cmd -SkipLocalPackage
+```
+
+## Neue Version veröffentlichen
+
+Vor dem nächsten Release die Version in `Directory.Build.props` erhöhen. Beispiel:
+
+```xml
+<Version>0.9.1-preview</Version>
+<FileVersion>0.9.1.0</FileVersion>
+<AssemblyVersion>0.9.1.0</AssemblyVersion>
+```
+
+Danach erneut `build\publish.cmd` ausführen.

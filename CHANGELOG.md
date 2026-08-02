@@ -1,5 +1,16 @@
 # Changelog
 
+
+## Unveröffentlicht
+
+### Build und Release
+
+- Vollautomatische Veröffentlichung über `build\publish.cmd`.
+- Version, Branch, Remote und Git-Status werden vor dem Push geprüft.
+- Lokale Änderungen können optional automatisch committet werden.
+- Der Git-Tag wird aus `Directory.Build.props` erzeugt.
+- Nach dem Tag-Push erstellt GitHub Actions automatisch den Release und lädt das Portable-ZIP hoch.
+
 Alle bedeutenden Änderungen dieses Projekts werden hier dokumentiert.
 
 ## [Unreleased]

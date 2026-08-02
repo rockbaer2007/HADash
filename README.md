@@ -91,3 +91,23 @@ Bis dahin sollte das Projekt als Preview gekennzeichnet bleiben.
 ## Lizenz
 
 MIT License. Entwickelt von UGSo mit Hilfe von ChatGPT.
+
+
+## Automatisches Veröffentlichen
+
+Ein vollständiger Preview-Release wird mit einem Befehl vorbereitet und zu GitHub übertragen:
+
+```cmd
+build\publish.cmd
+```
+
+Das Skript liest die Version aus `Directory.Build.props`, baut das Portable-Paket, pusht den aktuellen Branch, erstellt und pusht den passenden Git-Tag. Der GitHub-Actions-Workflow erzeugt danach automatisch den GitHub-Release und lädt das ZIP als Release-Datei hoch.
+
+Sind noch lokale Änderungen vorhanden, können sie direkt übernommen werden:
+
+```cmd
+build\publish.cmd -CommitMessage "Release v0.9.0-preview"
+```
+
+Details stehen in [`docs/developer/RELEASE_CHECKLIST.md`](docs/developer/RELEASE_CHECKLIST.md).
+
