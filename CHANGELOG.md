@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.9.2-preview] - 2026-08-02
+
+### Geändert
+
+- Buttons im hellen Theme sind jetzt weiß und klar von den Icons unterscheidbar.
+- Buttons im blauen Theme sind jetzt ebenfalls weiß.
+- Hover- und gedrückte Zustände bleiben in beiden Themes sichtbar.
+- Release-Publisher vollständig robust überarbeitet.
+- Versionsauslesung unterstützt `Version` sowie `VersionPrefix`/`VersionSuffix`.
+- Tag-Prüfung verursacht bei noch nicht vorhandenem Tag keinen Abbruch mehr.
+- `publish.cmd` verwendet eine sichere einzeilige PowerShell-Ausführung.
+
 
 ## Unveröffentlicht
 

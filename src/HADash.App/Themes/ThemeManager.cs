@@ -25,10 +25,7 @@ public static class ThemeManager
 
         if (control is Button button)
         {
-            button.FlatStyle = FlatStyle.Flat;
-            button.FlatAppearance.BorderColor = palette.Accent;
-            button.FlatAppearance.MouseOverBackColor = palette.ButtonHoverBackground;
-            button.FlatAppearance.MouseDownBackColor = palette.Accent;
+            ApplyButton(button, palette);
         }
         else if (control is RichTextBox richTextBox)
         {
@@ -48,6 +45,23 @@ public static class ThemeManager
 
         foreach (Control child in control.Controls)
             ApplyControl(child, palette);
+    }
+
+    private static void ApplyButton(Button button, ThemePalette palette)
+    {
+        button.UseVisualStyleBackColor = false;
+        button.FlatStyle = FlatStyle.Flat;
+        button.BackColor = palette.ButtonBackground;
+        button.ForeColor = palette.Foreground;
+        button.FlatAppearance.BorderSize = 1;
+        button.FlatAppearance.BorderColor = palette.ButtonBorder;
+        button.FlatAppearance.MouseOverBackColor = palette.ButtonHoverBackground;
+        button.FlatAppearance.MouseDownBackColor = palette.ButtonPressedBackground;
+
+        // Ein deaktivierter Button soll auch im dunklen Theme noch als Steuerelement
+        // erkennbar bleiben. WinForms zeichnet den Text selbst abgeblendet.
+        if (!button.Enabled)
+            button.BackColor = ControlPaint.Dark(palette.ButtonBackground, 0.08f);
     }
 
     private static Color GetBackground(Control control, ThemePalette palette) => control switch

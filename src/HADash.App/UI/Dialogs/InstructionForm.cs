@@ -75,7 +75,11 @@ public sealed class InstructionForm : Form
                 "HINWEIS\n\n" +
                 "Unterstützt werden .dash, .yaml, .yml, .json, .txt, .lovelace sowie Dateien ohne bekannte Endung über die Auswahl „Alle Dateien (*.*)“."
         };
-        instructions.LinkClicked += (_, e) => OpenUrl(e.LinkText);
+        instructions.LinkClicked += (_, e) =>
+        {
+            if (!string.IsNullOrWhiteSpace(e.LinkText))
+                OpenUrl(e.LinkText);
+        };
 
         var footer = new FlowLayoutPanel
         {
