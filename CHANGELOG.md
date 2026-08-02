@@ -18,6 +18,16 @@ Alle bedeutenden Änderungen dieses Projekts werden hier dokumentiert.
 - vollständige lokale und GitHub-Actions-Validierung der Build- und Release-Pipeline
 - portable Testinstallation auf einem zweiten Windows-System
 
+## [0.9.1-preview] - 2026-08-02
+
+### Darstellung
+
+- Dark Theme mit deutlich sichtbaren Symbol- und Dialogbuttons überarbeitet.
+- Dunkle Buttons besitzen jetzt einen hellgrauen Rand (`#9AA3AB`).
+- Eigene Farben für normalen, Hover- und gedrückten Buttonzustand ergänzt.
+- Home-Assistant-Theme erhält dieselbe verbesserte Buttonerkennung.
+- Theme-Wechsel bleibt vollständig vom Datei- und Parsercode getrennt.
+
 ## [0.9.0-preview] - 2026-08-02
 
 - bestehender Funktionsstand von HADash 2.5.3 übernommen

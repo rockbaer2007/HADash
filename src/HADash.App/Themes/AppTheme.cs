@@ -17,6 +17,8 @@ public sealed record ThemePalette(
     Color Foreground,
     Color ButtonBackground,
     Color ButtonHoverBackground,
+    Color ButtonPressedBackground,
+    Color ButtonBorder,
     Color Accent,
     Color EditorForeground,
     Color SyntaxKey,
