@@ -23,20 +23,29 @@ catch {
 }
 
 function Write-Step {
-    param([string]$Message)
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Message
+    )
 
     Write-Host ""
     Write-Host "==> $Message" -ForegroundColor Cyan
 }
 
 function Write-Success {
-    param([string]$Message)
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Message
+    )
 
     Write-Host $Message -ForegroundColor Green
 }
 
 function Write-WarningMessage {
-    param([string]$Message)
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Message
+    )
 
     Write-Host $Message -ForegroundColor Yellow
 }
@@ -57,7 +66,13 @@ function Invoke-NativeCommand {
     $exitCode = $LASTEXITCODE
 
     if (-not $IgnoreExitCode -and $exitCode -ne 0) {
-        throw "Befehl fehlgeschlagen: $FilePath $($Arguments -join ' ')`nFehlercode: $exitCode"
+        throw @"
+Befehl fehlgeschlagen:
+
+$FilePath $($Arguments -join ' ')
+
+Fehlercode: $exitCode
+"@
     }
 
     return $exitCode
@@ -77,7 +92,9 @@ function Get-XmlValue {
         [string]$ElementName
     )
 
-    $node = $Document.SelectSingleNode("//Project/PropertyGroup/$ElementName")
+    $node = $Document.SelectSingleNode(
+        "//Project/PropertyGroup/$ElementName"
+    )
 
     if ($null -eq $node) {
         return $null
@@ -104,28 +121,38 @@ function Get-ProjectVersion {
         throw "Directory.Build.props wurde nicht gefunden: $propsPath"
     }
 
-    [xml]$props = Get-Content -LiteralPath $propsPath -Raw -Encoding UTF8
+    [xml]$props = Get-Content `
+        -LiteralPath $propsPath `
+        -Raw `
+        -Encoding UTF8
 
-    $version = Get-XmlValue -Document $props -ElementName "Version"
+    $version = Get-XmlValue `
+        -Document $props `
+        -ElementName "Version"
 
     if (-not [string]::IsNullOrWhiteSpace($version)) {
         return $version
     }
 
-    $versionPrefix = Get-XmlValue -Document $props -ElementName "VersionPrefix"
-    $versionSuffix = Get-XmlValue -Document $props -ElementName "VersionSuffix"
+    $versionPrefix = Get-XmlValue `
+        -Document $props `
+        -ElementName "VersionPrefix"
+
+    $versionSuffix = Get-XmlValue `
+        -Document $props `
+        -ElementName "VersionSuffix"
 
     if ([string]::IsNullOrWhiteSpace($versionPrefix)) {
         throw @"
 In Directory.Build.props wurde keine Versionsnummer gefunden.
 
-Erwartet wird entweder:
+Verwende entweder:
 
-<Version>0.9.1-preview</Version>
+<Version>0.9.2-preview</Version>
 
 oder:
 
-<VersionPrefix>0.9.1</VersionPrefix>
+<VersionPrefix>0.9.2</VersionPrefix>
 <VersionSuffix>preview</VersionSuffix>
 "@
     }
@@ -138,13 +165,21 @@ oder:
 }
 
 function Test-CommandAvailable {
-    param([string]$CommandName)
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$CommandName
+    )
 
-    return $null -ne (Get-Command $CommandName -ErrorAction SilentlyContinue)
+    return $null -ne (
+        Get-Command $CommandName -ErrorAction SilentlyContinue
+    )
 }
 
 function Test-GitTagExistsLocally {
-    param([string]$Tag)
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Tag
+    )
 
     & git show-ref --verify --quiet "refs/tags/$Tag"
     return $LASTEXITCODE -eq 0
@@ -152,23 +187,38 @@ function Test-GitTagExistsLocally {
 
 function Test-GitTagExistsRemotely {
     param(
+        [Parameter(Mandatory = $true)]
         [string]$Remote,
+
+        [Parameter(Mandatory = $true)]
         [string]$Tag
     )
 
-    $result = & git ls-remote --tags $Remote "refs/tags/$Tag" 2>$null
+    $tagReference = "refs/tags/$Tag"
+
+    $result = @(
+        & git ls-remote `
+            --tags `
+            --refs `
+            $Remote `
+            $tagReference `
+            2>$null
+    )
 
     if ($LASTEXITCODE -ne 0) {
-        throw "Remote-Tags konnten nicht von '$Remote' gelesen werden."
+        throw "Die Tags des Remotes '$Remote' konnten nicht gelesen werden."
     }
 
-    return -not [string]::IsNullOrWhiteSpace(($result | Out-String))
+    return $result.Count -gt 0
 }
 
 function Get-CurrentCommit {
     $commit = (& git rev-parse HEAD).Trim()
 
-    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($commit)) {
+    if (
+        $LASTEXITCODE -ne 0 -or
+        [string]::IsNullOrWhiteSpace($commit)
+    ) {
         throw "Der aktuelle Git-Commit konnte nicht ermittelt werden."
     }
 
@@ -176,9 +226,12 @@ function Get-CurrentCommit {
 }
 
 function Get-TagCommit {
-    param([string]$Tag)
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Tag
+    )
 
-    $commit = (& git rev-list -n 1 $Tag 2>$null)
+    $commit = & git rev-list -n 1 $Tag 2>$null
 
     if ($LASTEXITCODE -ne 0) {
         return $null
@@ -188,14 +241,44 @@ function Get-TagCommit {
 }
 
 function Confirm-Action {
-    param([string]$Message)
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Message
+    )
 
     if ($Yes) {
         return $true
     }
 
     $answer = Read-Host "$Message [j/N]"
+
     return $answer -match "^(j|ja|y|yes)$"
+}
+
+function Get-ExpectedPackagePaths {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RepositoryRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Version,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Tag
+    )
+
+    return @(
+        (
+            Join-Path `
+                $RepositoryRoot `
+                "artifacts\packages\HADash-$Version-Portable-win-x64.zip"
+        ),
+        (
+            Join-Path `
+                $RepositoryRoot `
+                "artifacts\packages\HADash-$Tag-Portable-win-x64.zip"
+        )
+    )
 }
 
 $repositoryRoot = $null
@@ -241,13 +324,17 @@ try {
 Das Git-Remote 'origin' ist nicht eingerichtet.
 
 Beispiel:
+
 git remote add origin https://github.com/rockbaer2007/HADash.git
 "@
     }
 
     $remoteUrl = (& git remote get-url origin).Trim()
 
-    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($remoteUrl)) {
+    if (
+        $LASTEXITCODE -ne 0 -or
+        [string]::IsNullOrWhiteSpace($remoteUrl)
+    ) {
         throw "Die URL des Remotes 'origin' konnte nicht gelesen werden."
     }
 
@@ -257,14 +344,18 @@ git remote add origin https://github.com/rockbaer2007/HADash.git
 
     $branch = (& git branch --show-current).Trim()
 
-    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($branch)) {
+    if (
+        $LASTEXITCODE -ne 0 -or
+        [string]::IsNullOrWhiteSpace($branch)
+    ) {
         throw "Der aktuelle Git-Branch konnte nicht ermittelt werden."
     }
 
     Write-Host "Branch  : $branch"
 
     if ($branch -ne "main") {
-        Write-WarningMessage "Achtung: Der aktuelle Branch ist '$branch' und nicht 'main'."
+        Write-WarningMessage `
+            "Achtung: Der aktuelle Branch ist '$branch' und nicht 'main'."
 
         if (-not (Confirm-Action "Trotzdem fortfahren?")) {
             throw "Veroeffentlichung wurde abgebrochen."
@@ -282,7 +373,7 @@ Das Repository enthaelt noch nicht committete Aenderungen.
 
 Nutze beispielsweise:
 
-build\publish.cmd -CommitMessage "Release $tag"
+build\publish.cmd -CommitMessage "Release $tag" -Yes
 
 oder committe die Aenderungen vorher manuell.
 "@
@@ -290,6 +381,7 @@ oder committe die Aenderungen vorher manuell.
 
         Write-Host "Nicht committete Aenderungen wurden gefunden."
         Write-Host ""
+
         & git status --short
 
         if (-not (Confirm-Action "Alle angezeigten Aenderungen committen?")) {
@@ -298,8 +390,13 @@ oder committe die Aenderungen vorher manuell.
 
         Write-Step "Aenderungen committen"
 
-        Invoke-NativeCommand -FilePath "git" -Arguments @("add", "-A")
-        Invoke-NativeCommand -FilePath "git" -Arguments @("commit", "-m", $CommitMessage)
+        Invoke-NativeCommand `
+            -FilePath "git" `
+            -Arguments @("add", "-A")
+
+        Invoke-NativeCommand `
+            -FilePath "git" `
+            -Arguments @("commit", "-m", $CommitMessage)
 
         Write-Success "Commit wurde erstellt."
     }
@@ -309,64 +406,115 @@ oder committe die Aenderungen vorher manuell.
 
     Write-Step "Remote-Stand abrufen"
 
-    Invoke-NativeCommand -FilePath "git" -Arguments @("fetch", "origin", "--tags", "--prune")
+    Invoke-NativeCommand `
+        -FilePath "git" `
+        -Arguments @(
+            "fetch",
+            "origin",
+            "--tags",
+            "--prune"
+        )
 
-    $remoteTagExists = Test-GitTagExistsRemotely -Remote "origin" -Tag $tag
+    $remoteTagExists = Test-GitTagExistsRemotely `
+        -Remote "origin" `
+        -Tag $tag
 
     if ($remoteTagExists) {
         throw @"
 Der Tag '$tag' existiert bereits auf GitHub.
 
-Erhoehe zuerst die Version in Directory.Build.props.
+Pruefe ihn mit:
+
+git ls-remote --tags --refs origin refs/tags/$tag
+
+Falls der Tag unvollstaendig oder falsch ist, kannst du ihn entfernen:
+
+git push origin --delete $tag
+
+Danach lokal pruefen:
+
+git tag --list "$tag"
+
+Falls er lokal ebenfalls existiert:
+
+git tag -d $tag
 "@
     }
 
     if (-not $SkipPackage) {
         Write-Step "Portable-Paket erstellen"
 
-        $packageCmd = Join-Path $repositoryRoot "build\package.cmd"
+        $packageCmd = Join-Path `
+            $repositoryRoot `
+            "build\package.cmd"
 
-        if (-not (Test-Path $packageCmd)) {
+        if (-not (Test-Path -LiteralPath $packageCmd)) {
             throw "package.cmd wurde nicht gefunden: $packageCmd"
         }
 
-        Invoke-NativeCommand -FilePath "cmd.exe" -Arguments @("/d", "/c", "`"$packageCmd`"")
+        Invoke-NativeCommand `
+            -FilePath "cmd.exe" `
+            -Arguments @(
+                "/d",
+                "/c",
+                "`"$packageCmd`""
+            )
 
-        $expectedPackage = Join-Path $repositoryRoot "artifacts\packages\HADash-$tag-Portable-win-x64.zip"
-        $alternativePackage = Join-Path $repositoryRoot "artifacts\packages\HADash-$version-Portable-win-x64.zip"
+        $packagePaths = Get-ExpectedPackagePaths `
+            -RepositoryRoot $repositoryRoot `
+            -Version $version `
+            -Tag $tag
 
-        if (Test-Path $expectedPackage) {
-            Write-Success "Paket erstellt: $expectedPackage"
-        }
-        elseif (Test-Path $alternativePackage) {
-            Write-Success "Paket erstellt: $alternativePackage"
+        $existingPackage = $packagePaths |
+            Where-Object { Test-Path -LiteralPath $_ } |
+            Select-Object -First 1
+
+        if ($null -ne $existingPackage) {
+            Write-Success "Paket erstellt: $existingPackage"
         }
         else {
-            Write-WarningMessage "Der Build war erfolgreich, aber das erwartete ZIP wurde nicht automatisch gefunden."
+            Write-WarningMessage `
+                "Der Build war erfolgreich, aber das erwartete ZIP wurde nicht gefunden."
+
+            Write-Host "Gepruefte Pfade:"
+
+            foreach ($path in $packagePaths) {
+                Write-Host "  $path"
+            }
         }
     }
     else {
-        Write-WarningMessage "Paketerstellung wurde mit -SkipPackage uebersprungen."
+        Write-WarningMessage `
+            "Paketerstellung wurde mit -SkipPackage uebersprungen."
     }
 
-    Write-Step "Pruefen, ob nach dem Paketieren Aenderungen entstanden sind"
+    Write-Step "Repository nach dem Paketieren pruefen"
 
     $statusAfterPackage = (& git status --porcelain | Out-String).Trim()
 
     if (-not [string]::IsNullOrWhiteSpace($statusAfterPackage)) {
+        Write-Host ""
+        & git status --short
+        Write-Host ""
+
         throw @"
-Nach der Paketerstellung sind neue nicht committete Dateien oder Aenderungen entstanden.
+Nach der Paketerstellung sind nicht committete Dateien oder Aenderungen vorhanden.
 
-Pruefe:
-git status
-
-Build- und Paketdateien sollten normalerweise durch .gitignore ausgeschlossen sein.
+Build- und Paketdateien sollten normalerweise durch .gitignore
+ausgeschlossen sein.
 "@
     }
 
     Write-Step "Branch zu GitHub pushen"
 
-    Invoke-NativeCommand -FilePath "git" -Arguments @("push", "-u", "origin", $branch)
+    Invoke-NativeCommand `
+        -FilePath "git" `
+        -Arguments @(
+            "push",
+            "-u",
+            "origin",
+            $branch
+        )
 
     $currentCommit = Get-CurrentCommit
     $localTagExists = Test-GitTagExistsLocally -Tag $tag
@@ -375,7 +523,7 @@ Build- und Paketdateien sollten normalerweise durch .gitignore ausgeschlossen se
         $localTagCommit = Get-TagCommit -Tag $tag
 
         if ([string]::IsNullOrWhiteSpace($localTagCommit)) {
-            throw "Der vorhandene lokale Tag '$tag' konnte nicht ausgewertet werden."
+            throw "Der lokale Tag '$tag' konnte nicht ausgewertet werden."
         }
 
         if ($localTagCommit -ne $currentCommit) {
@@ -388,36 +536,52 @@ $localTagCommit
 Aktueller Commit:
 $currentCommit
 
-Loesche den lokalen Tag und starte erneut:
+Loesche den lokalen Tag:
 
 git tag -d $tag
+
+Starte danach erneut:
+
+build\publish.cmd -Yes
 "@
         }
 
-        Write-Success "Der lokale Tag '$tag' zeigt bereits auf den aktuellen Commit."
+        Write-Success `
+            "Der lokale Tag '$tag' zeigt bereits auf den aktuellen Commit."
     }
     else {
         Write-Step "Lokalen Release-Tag erstellen"
 
-        Invoke-NativeCommand -FilePath "git" -Arguments @(
-            "tag",
-            "-a",
-            $tag,
-            "-m",
-            "HADash $tag"
-        )
+        Invoke-NativeCommand `
+            -FilePath "git" `
+            -Arguments @(
+                "tag",
+                "-a",
+                $tag,
+                "-m",
+                "HADash $tag"
+            )
 
         Write-Success "Tag '$tag' wurde erstellt."
     }
 
     Write-Step "Release-Tag zu GitHub pushen"
 
-    Invoke-NativeCommand -FilePath "git" -Arguments @("push", "origin", $tag)
+    Invoke-NativeCommand `
+        -FilePath "git" `
+        -Arguments @(
+            "push",
+            "origin",
+            $tag
+        )
 
     Write-Host ""
-    Write-Host "============================================" -ForegroundColor Green
-    Write-Host " Veroeffentlichung erfolgreich gestartet" -ForegroundColor Green
-    Write-Host "============================================" -ForegroundColor Green
+    Write-Host "============================================" `
+        -ForegroundColor Green
+    Write-Host " Veroeffentlichung erfolgreich gestartet" `
+        -ForegroundColor Green
+    Write-Host "============================================" `
+        -ForegroundColor Green
     Write-Host ""
     Write-Host "Version : $version"
     Write-Host "Tag     : $tag"
@@ -430,14 +594,20 @@ git tag -d $tag
 }
 catch {
     Write-Host ""
-    Write-Host "Veroeffentlichung fehlgeschlagen." -ForegroundColor Red
+    Write-Host "Veroeffentlichung fehlgeschlagen." `
+        -ForegroundColor Red
     Write-Host ""
-    Write-Host $_.Exception.Message -ForegroundColor Red
+    Write-Host $_.Exception.Message `
+        -ForegroundColor Red
     Write-Host ""
+
     exit 1
 }
 finally {
-    if ($null -ne $repositoryRoot -and (Test-Path $repositoryRoot)) {
+    if (
+        $null -ne $repositoryRoot -and
+        (Test-Path -LiteralPath $repositoryRoot)
+    ) {
         Set-Location $repositoryRoot
     }
 }
