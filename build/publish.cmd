@@ -1,9 +1,18 @@
 @echo off
 setlocal
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0publish.ps1" %*
-set EXITCODE=%ERRORLEVEL%
-if not "%EXITCODE%"=="0" (
-  echo.
-  echo Veröffentlichung fehlgeschlagen. Fehlercode: %EXITCODE%
+
+set "SCRIPT=%~dp0publish.ps1"
+
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%SCRIPT%" %*
+
+set "EXIT_CODE=%ERRORLEVEL%"
+
+if not "%EXIT_CODE%"=="0" (
+    echo.
+    echo Veroeffentlichung fehlgeschlagen. Fehlercode: %EXIT_CODE%
+    exit /b %EXIT_CODE%
 )
-exit /b %EXITCODE%
+
+echo.
+echo Veroeffentlichung erfolgreich abgeschlossen.
+exit /b 0
