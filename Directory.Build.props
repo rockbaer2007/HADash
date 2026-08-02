@@ -1,8 +1,8 @@
 <Project>
   <PropertyGroup>
-    <Version>3.0.0</Version>
-    <FileVersion>3.0.0.0</FileVersion>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <Version>0.9.0-preview</Version>
+    <FileVersion>0.9.0.0</FileVersion>
+    <AssemblyVersion>0.9.0.0</AssemblyVersion>
     <Company>UGSo</Company>
     <Authors>UGSo</Authors>
     <Copyright>© 2026 UGSo</Copyright>

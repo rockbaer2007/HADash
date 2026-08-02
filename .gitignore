@@ -1,19 +1,42 @@
+# IDEs and editors
 .vs/
 .idea/
 .vscode/
-**/bin/
-**/obj/
-artifacts/staging/
-artifacts/packages/*.zip
 *.user
 *.suo
+*.DotSettings.user
+
+# Build output
+**/bin/
+**/obj/
+packages/
+publish/
+
+# Generated artifacts
+artifacts/staging/
+artifacts/packages/*.zip
+release/
+*.pdb
+
+# Local caches and temporary files
 *.cache
 *.log
+*.tmp
+*.bak
+
+# Portable user configuration (never commit personal settings)
 config/user.config
 src/HADash.App/config/user.config
+
+# Runtime folders: keep folder placeholders only
 src/HADash.App/logs/*
 !src/HADash.App/logs/.gitkeep
 src/HADash.App/backups/*
 !src/HADash.App/backups/.gitkeep
 src/HADash.App/temp/*
 !src/HADash.App/temp/.gitkeep
+
+# Windows metadata
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/

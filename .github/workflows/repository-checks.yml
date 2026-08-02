@@ -1,0 +1,26 @@
+name: Repository checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  repository-hygiene:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject committed portable user configuration
+        shell: bash
+        run: |
+          if git ls-files | grep -E '(^|/)user\.config$'; then
+            echo "Personal user.config must not be committed."
+            exit 1
+          fi
+      - name: Verify required repository files
+        shell: bash
+        run: |
+          for file in README.md LICENSE CHANGELOG.md ROADMAP.md CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md .gitignore .gitattributes .editorconfig; do
+            test -f "$file" || { echo "Missing $file"; exit 1; }
+          done

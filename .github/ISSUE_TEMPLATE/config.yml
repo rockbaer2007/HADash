@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Home Assistant Dokumentation
+    url: https://www.home-assistant.io/docs/
+    about: Allgemeine Fragen zu Home Assistant bitte zuerst mit der offiziellen Dokumentation abgleichen.

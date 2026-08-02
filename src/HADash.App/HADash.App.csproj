@@ -30,7 +30,4 @@
     <EmbeddedResource Include="Resources\visualisierung.png"
                       LogicalName="HADashboardBackupExporteurUGSo.Resources.visualisierung.png" />
   </ItemGroup>
-  <ItemGroup>
-    <None Update="config\user.config" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
 </Project>
