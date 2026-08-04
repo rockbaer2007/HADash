@@ -90,7 +90,7 @@ Bis dahin sollte das Projekt als Preview gekennzeichnet bleiben.
 
 ## Lizenz
 
-MIT License. Entwickelt von UGSo mit Hilfe von ChatGPT.
+MIT License. Siehe [LICENSE](LICENSE). Entwickelt von UGSo mit Hilfe von ChatGPT.
 
 
 ## Automatisches Veröffentlichen
@@ -110,4 +110,3 @@ build\publish.cmd -CommitMessage "Release v0.9.0-preview"
 ```
 
 Details stehen in [`docs/developer/RELEASE_CHECKLIST.md`](docs/developer/RELEASE_CHECKLIST.md).
-
